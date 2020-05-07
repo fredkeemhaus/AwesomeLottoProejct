@@ -137,7 +137,7 @@ export default class SaveNumber extends Component {
           </ScrollView>
         ) : (
           <View>
-            <Text>저장된 번호가 없습니다.</Text>
+            <Text>저장된 번호가 없습니다!.</Text>
           </View>
         )}
         <View style={{width: '100%', position: 'relative', bottom: 0}}>
