@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import { View, Text, TouchableOpacity, AsyncStorage } from "react-native";
+import { View, Text, AppState, TouchableOpacity, AsyncStorage } from "react-native";
 import { item } from "../api";
 import moment from "moment";
 import styled from "styled-components";
 import _ from 'lodash';
 import { v1 as uuidv1 } from 'uuid';
+import NumberTicker from 'react-native-number-ticker';
+
 import {
   AdMobBanner,
   AdMobInterstitial,
@@ -43,17 +45,20 @@ const NowLottoNumberContainer = styled.View`
 const LottoCircleBox = styled.View`
   width: 30px;
   height: 30px;
-  justify-content: center;s
+  justify-content: center;
   align-items: center;
 `;
 
 const LottoNumberCircleBox = styled.View`
   width: 30px;
   height: 30px;
-  background-color: red;
+  background-color: white;
   justify-content: center;
   align-items: center;
+  /* padding-right: 8px; */
+  padding-bottom: 2px;
   border-radius: 30px;
+  box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
 `
 
 // background-color: ${props => (props.backgroundCondition ? 'white' : 'transparent')};
@@ -72,18 +77,46 @@ export default class Lotto extends Component {
     };
   }
 
-  componentDidMount = async () => {
+  state: State = {
+    appState: AppState.currentState,
+  };
+
+  async componentWillMount() {
+    AppState.addEventListener('change', async nextAppState => {
+      if (
+        this.state.appState.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        await this.loadHomeData();
+        this.setState({appState: nextAppState});
+      }
+    });
+  }
+  
+  async componentWillReceiveProps(nextProps) {
+    if (this.isOnEnter(nextProps)) {
+      await this.loadHomeData();
+    }
+  }
+
+  async componentDidMount() {
+    try {
+      await this.loadHomeData();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  loadHomeData = async () => {
     let startDate = new Date("2002-12-07");
     let nowDate = new Date();
     let diffDate = nowDate - startDate;
 
     await Tasks.all(saveNumber => this.setState({ saveNumber: saveNumber || [] }));
-    console.log(this.state,'asd')
 
     const nowDrwDate = parseInt(diffDate / (24 * 60 * 60 * 1000) / 7) + 1;
-    console.log(nowDrwDate, "-");
-
     let drwNumberData;
+
     try {
       ({ data: drwNumberData } = await item.getDrw(nowDrwDate));
 
@@ -95,7 +128,7 @@ export default class Lotto extends Component {
         drwNumberData
       });
     }
-  };
+  }
 
   _numberReturn = () => {
     let lottoNumber = _.sampleSize(_.range(1, 45), 7)
@@ -124,55 +157,90 @@ export default class Lotto extends Component {
 
   render() {
     const { drwNumberData, lottoNumber } = this.state;
-
-    console.log(lottoNumber, '-')
+    const sortArray = lottoNumber && lottoNumber.sort(function(a, b) {
+      return a - b
+    });
+    console.log(sortArray, '-')
     return (
-      <View style={{height: '100%'}}>
+      <View style={{height: '100%', backgroundColor: '#4d4c7d'}}>
         <View style={{paddingHorizontal: 30}}>
           <View style={{marginTop: 20}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text>현재 날짜</Text>
+              <Text style={{fontWeight: 'bold'}}>현재 날짜</Text>
               <Text>{momentNowDate}</Text>
             </View>
-            <View style={{backgroundColor: 'white', padding: 20, borderRadius: 14, marginVertical: 10}}>
+            <View style={{
+              backgroundColor: 'white',
+              padding: 20,
+              borderRadius: 14,
+              marginVertical: 10,
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.5
+              }}>
               <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
                 <Text>{drwNumberData && drwNumberData.drwNo} 회차</Text>
               </View>
+              
               <NowLottoNumberContainer>
                 <LottoNumberCircleBox>
-                    <Text>
-                      {drwNumberData && drwNumberData.drwtNo1}
-                    </Text>
+                  <NumberTicker
+                    number={drwNumberData && drwNumberData.drwtNo1}
+                    textSize={14}
+                    duration={500}
+                    textStyle={{fontWeight: 'bold'}}
+                    style={{padding: 0, margin: 0}}
+                  />
                 </LottoNumberCircleBox>
                 <LottoNumberCircleBox>
-                    <Text>
-                      {drwNumberData && drwNumberData.drwtNo2}
-                    </Text>
+                  <NumberTicker
+                    number={drwNumberData && drwNumberData.drwtNo2}
+                    textSize={14}
+                    duration={1000}
+                    textStyle={{fontWeight: 'bold'}}
+                  />
                 </LottoNumberCircleBox>
                 <LottoNumberCircleBox>
-                    <Text>
-                      {drwNumberData && drwNumberData.drwtNo3}
-                    </Text>
+                  <NumberTicker
+                      number={drwNumberData && drwNumberData.drwtNo3}
+                      textSize={14}
+                      duration={1500}
+                      textStyle={{fontWeight: 'bold'}}
+                    />
                 </LottoNumberCircleBox>
                 <LottoNumberCircleBox>
-                    <Text>
-                      {drwNumberData && drwNumberData.drwtNo4}
-                    </Text>
+                  <NumberTicker
+                    number={drwNumberData && drwNumberData.drwtNo4}
+                    textSize={14}
+                    duration={2000}
+                    textStyle={{fontWeight: 'bold'}}
+                  />
                 </LottoNumberCircleBox>
                 <LottoNumberCircleBox>
-                    <Text>
-                      {drwNumberData && drwNumberData.drwtNo5}
-                    </Text>
+                  <NumberTicker
+                    number={drwNumberData && drwNumberData.drwtNo5}
+                    textSize={14}
+                    duration={2500}
+                    textStyle={{fontWeight: 'bold'}}
+                  />
                 </LottoNumberCircleBox>
                 <LottoNumberCircleBox>
-                    <Text>
-                      {drwNumberData && drwNumberData.drwtNo6}
-                    </Text>
+                  <NumberTicker
+                    number={drwNumberData && drwNumberData.drwtNo6}
+                    textSize={14}
+                    duration={3000}
+                    textStyle={{fontWeight: 'bold'}}
+                  />
                 </LottoNumberCircleBox>
                 <LottoNumberCircleBox>
-                    <Text>
-                      {drwNumberData && drwNumberData.bnusNo}
-                    </Text>
+                    <NumberTicker
+                      number={drwNumberData && drwNumberData.bnusNo}
+                      textSize={14}
+                      duration={3500}
+                      textStyle={{fontWeight: 'bold'}}
+                    />
                 </LottoNumberCircleBox>
               </NowLottoNumberContainer>
             </View>
@@ -181,27 +249,18 @@ export default class Lotto extends Component {
             <>
               <View style={{backgroundColor: 'white', padding: 20, borderRadius: 14, marginVertical: 10}}>
                 <NowLottoNumberContainer>
-                  <LottoNumberCircleBox>
-                    <Text>{lottoNumber[0]}</Text>
-                  </LottoNumberCircleBox>
-                  <LottoNumberCircleBox>
-                    <Text>{lottoNumber[1]}</Text>
-                  </LottoNumberCircleBox>
-                  <LottoNumberCircleBox>
-                    <Text>{lottoNumber[2]}</Text>
-                  </LottoNumberCircleBox>
-                  <LottoNumberCircleBox>
-                    <Text>{lottoNumber[3]}</Text>
-                  </LottoNumberCircleBox>
-                  <LottoNumberCircleBox>
-                    <Text>{lottoNumber[4]}</Text>
-                  </LottoNumberCircleBox>
-                  <LottoNumberCircleBox>
-                    <Text>{lottoNumber[5]}</Text>
-                  </LottoNumberCircleBox>
-                  <LottoNumberCircleBox>
-                    <Text>{lottoNumber[6]}</Text>
-                  </LottoNumberCircleBox>
+                  {sortArray.map((v, i) => {
+                    return (
+                      <LottoNumberCircleBox>
+                        <NumberTicker
+                          number={lottoNumber[i]}
+                          textSize={14}
+                          duration={i * 1000}
+                          textStyle={{fontWeight: 'bold'}}
+                        />
+                      </LottoNumberCircleBox>
+                    )
+                  })}
                 </NowLottoNumberContainer>
               </View>
               <View>
