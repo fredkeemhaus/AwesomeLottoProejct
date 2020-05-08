@@ -13,8 +13,8 @@ const GridContainer = styled.View`
 
 const GameSetCircle = styled.View`
     border: 2px solid #fff;
-    border: 1px solid ${props => (props.includeWin ? '#4d4c7d' : 'black')};
-    background-color: ${props => (props.includeWin ? '#4d4c7d' : 'transparent')};
+    border: 1px solid ${props => (props.includeWin ? '#21243d' : 'black')};
+    background-color: ${props => (props.includeWin ? '#21243d' : 'transparent')};
     width: 45px;
     height: 45px;
     border-radius: 45px;
@@ -82,7 +82,7 @@ export default class SlotLotto extends Component {
         const {startGameWin, number, startGameSetWinRandom, startGameState} = this.state;
         console.log(this.state.startGameSetWinRandom, '-')
         return (
-            <View style={{backgroundColor: '#4d4c7d', height: '100%'}}>
+            <View style={{backgroundColor: '#21243d', height: '100%'}}>
                 {!startGameState && (
                     <View style={{
                         marginHorizontal: 30,
@@ -122,7 +122,7 @@ export default class SlotLotto extends Component {
                                 style={{
                                     width: '100%',
                                     height: 50,
-                                    backgroundColor: '#4d4c7d',
+                                    backgroundColor: '#21243d',
                                     justifyContent: "center",
                                     alignItems: 'center',
                                     borderRadius: 10,
@@ -167,7 +167,7 @@ export default class SlotLotto extends Component {
                                 onPress={() => {
                                     this.startGame()
                                 }}
-                                style={{width: '100%', height: 50, backgroundColor: '#4d4c7d', justifyContent: "center", alignItems: 'center', borderRadius: 10}}
+                                style={{width: '100%', height: 50, backgroundColor: '#21243d', justifyContent: "center", alignItems: 'center', borderRadius: 10}}
                             >
                                 <Text style={{color: 'white', fontSize: 16, fontWeight: 'bold'}}>게임 시작하기</Text>
                             </TouchableOpacity>

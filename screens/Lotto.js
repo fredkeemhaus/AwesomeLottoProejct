@@ -5,6 +5,7 @@ import moment from "moment";
 import styled from "styled-components";
 import _ from 'lodash';
 import { v1 as uuidv1 } from 'uuid';
+import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
 
 
@@ -163,12 +164,32 @@ export default class Lotto extends Component {
     });
 
     return (
-      <View style={{height: '100%', backgroundColor: '#4d4c7d'}}>
+      <View style={{height: '100%', backgroundColor: '#21243d'}}>
         <View style={{paddingHorizontal: 30}}>
           <View style={{marginTop: 20}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={{fontWeight: 'bold', color: 'white'}}>현재 날짜</Text>
+              <Text style={{fontWeight: 'bold', color: 'white'}}>오늘 날짜</Text>
               <Text style={{color: 'white'}}>{momentNowDate}</Text>
+            </View>
+            <View style={{
+              backgroundColor: 'white',
+              padding: 20,
+              borderRadius: 14,
+              marginVertical: 10,
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.5,
+              }}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Text style={{fontWeight: 'normal', fontSize: 14}}>총 당첨인원</Text>
+                <Text style={{fontWeight: 'bold', fontSize: 18}}>{numeral(drwNumberData && drwNumberData.firstPrzwnerCo).format('0,0')} 명</Text>
+              </View>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Text style={{fontWeight: 'normal', fontSize: 14}}>총 판매금액</Text>
+                <Text style={{fontWeight: 'bold', fontSize: 18}}>{numeral(drwNumberData && drwNumberData.totSellamnt).format('0,0')} 원</Text>
+              </View>
             </View>
             <View style={{
               backgroundColor: 'white',
@@ -183,6 +204,10 @@ export default class Lotto extends Component {
               }}>
               <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
                 <Text>{drwNumberData && drwNumberData.drwNo} 회차</Text>
+              </View>
+
+              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
+                <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
               </View>
               
               <NowLottoNumberContainer>
