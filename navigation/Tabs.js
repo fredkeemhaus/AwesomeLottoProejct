@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Lotto from "../screens/Lotto";
+import SlotLotto from "../screens/SlotLotto";
 import SaveNumber from "../screens/SaveNumber";
 import MyPage from "../screens/MyPage";
 
@@ -18,6 +19,7 @@ export default ({ navigation, route }) => {
   return (
     <Tabs.Navigator>
       <Tabs.Screen name="번호 뽑기" component={Lotto} />
+      <Tabs.Screen name="슬롯 번호 뽑기" component={SlotLotto} />
       <Tabs.Screen name="저장 번호" component={SaveNumber} />
       <Tabs.Screen name="당첨 확인" component={MyPage} />
     </Tabs.Navigator>

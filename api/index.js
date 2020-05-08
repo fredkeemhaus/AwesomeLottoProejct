@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: `https://www.nlotto.co.kr`
+  baseURL: `https://www.dhlottery.co.kr`
 });
 
 export const item = {
