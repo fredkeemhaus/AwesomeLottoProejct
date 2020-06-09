@@ -60,9 +60,9 @@ export default class LottoNumbers extends Component {
                         <>
                             <Text
                                 style={[
-                                    styles.text,
-                                    isCompleted ? styles.completedText : styles.uncompletedText
-                                ]}
+                                        styles.text,
+                                        isCompleted ? styles.completedText : styles.uncompletedText
+                                    ]}
                                 >
                                     {v}
                             </Text>
@@ -153,7 +153,8 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: "600",
     fontSize: 20,
-    marginVertical: 20
+    marginVertical: 20,
+    color: 'white'
   },
   completedText: {
     color: "#bbb",

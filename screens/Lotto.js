@@ -147,17 +147,6 @@ export default class Lotto extends Component {
   }
 
   _addLottoNumber = (lottoNumber) => {
-
-      // this.setState(
-      //     prevState => {
-      //       let { saveNumber, saveLottoNumber } = prevState;
-      //       return {
-      //         saveNumber: saveNumber.concat({ key: saveNumber.length, lottoNumber: lottoNumber }),
-      //         lottoNumber: null
-      //       };
-      //     },
-      //     () => Tasks.save(this.state.saveNumber)
-      // );
       this.setState(prevState => {
         if (lottoNumber.length !== 0) {
           const ID = uuidv1();
@@ -186,6 +175,20 @@ export default class Lotto extends Component {
 
     console.log(this.state, '------------');
   }
+
+  _completeToDo = id => {
+    this.setState(prevState => {
+      const newState = {
+        ...prevState,
+        toDos: {
+          ...prevState.toDos,
+          [id]: { ...prevState.toDos[id], isCompleted: true }
+        }
+      };
+      this._saveToDos(newState.toDos);
+      return { ...newState };
+    });
+  };
 
   _deleteNumber = (id) => {
     this.setState(prevState => {
@@ -339,7 +342,7 @@ export default class Lotto extends Component {
               </NowLottoNumberContainer>
             </View>
           </View>
-          {lottoNumber ? (
+          {lottoNumber && lottoNumber.length !== 0 ? (
             <>
               <View style={{backgroundColor: 'white', padding: 20, borderRadius: 14, marginVertical: 10}}>
                 <NowLottoNumberContainer>

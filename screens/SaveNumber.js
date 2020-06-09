@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import styled from "styled-components";
-import { View, Text, AsyncStorage, TouchableOpacity, AppState } from "react-native";
+import { View, Text, AsyncStorage, TouchableOpacity, AppState, ScrollView } from "react-native";
 import { AntDesign } from '@expo/vector-icons'; 
 import {
   AdMobBanner,
@@ -9,7 +9,7 @@ import {
   AdMobRewarded,
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
-import { ScrollView } from "react-native-gesture-handler";
+import LottoNumbers from "../components/LottoNumbers";
 
 
 let Tasks = {
@@ -58,14 +58,22 @@ export default class SaveNumber extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      saveNumber: []
+      saveNumber: [],
+      saveNumbers: {}
     };
   }
 
 
   async componentDidMount() {
-    await this.loadSaveData();
+    try {
+      await this.loadSaveData();
+      const r = await this._loadToDos();
+      console.log(r,'----')
+    } catch(e) {
+      console.log(e)
+    }
   };
+  
   
   async componentWillReceiveProps(nextProps) {
     if (this.isOnEnter(nextProps)) {
@@ -96,13 +104,40 @@ export default class SaveNumber extends Component {
     alert('삭제되었습니다.')
   };
 
+  _loadToDos = async () => {
+    try {
+      const toDos = await AsyncStorage.getItem("toDos");
+      console.log(toDos,'-')
+      const parsedToDos = JSON.parse(toDos)
+      console.log(toDos,'asdssss');
+      this.setState({ loadedTodos: true, saveNumbers: parsedToDos})
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  _refreshButton = async () => {
+    try {
+      await this._loadToDos();
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
   render() {
-    const {saveNumber} = this.state;
-    console.log(saveNumber, 'asd')
+    const {saveNumber, saveNumbers} = this.state;
+    console.log(saveNumbers, 'asd')
     // console.log(saveNumber, 'sad')
     
     return (
       <View style={{height: '100%', backgroundColor: '#4d4c7d'}}>
+        <ScrollView>
+            {Object.values(saveNumbers).map( number => (
+              <LottoNumbers key={number.id} {...number}
+                // deleteNumber={this._deleteNumber}
+                />
+            ))}
+          </ScrollView>
         {saveNumber ? (
           <ScrollView style={{paddingHorizontal: 30, marginTop: 10}}>
             {saveNumber && saveNumber.map((v, i) => {
@@ -140,6 +175,11 @@ export default class SaveNumber extends Component {
             <Text>저장된 번호가 없습니다!.</Text>
           </View>
         )}
+        <View>
+          <TouchableOpacity onPress={this._refreshButton}>
+            <Text>asd</Text>
+          </TouchableOpacity>
+        </View>
         <View style={{width: '100%', position: 'relative', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"
