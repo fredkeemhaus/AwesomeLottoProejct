@@ -117,7 +117,7 @@ export default class SaveNumber extends Component {
       console.log(toDos,'-')
       const parsedToDos = JSON.parse(toDos)
       console.log(toDos,'asdssss');
-      this.setState({ loadedTodos: true, saveNumbers: parsedToDos})
+      this.setState({ loadedTodos: true, saveNumbers: parsedToDos || {}})
     } catch(e) {
       console.log(e)
     }

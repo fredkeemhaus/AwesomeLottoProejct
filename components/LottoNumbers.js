@@ -32,9 +32,6 @@ export default class LottoNumbers extends Component {
     isCompleted: PropTypes.bool.isRequired,
     deleteNumber: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
-    uncompleteToDo: PropTypes.func.isRequired,
-    completeToDo: PropTypes.func.isRequired,
-    updateToDo: PropTypes.func.isRequired
   };
   render() {
     const { isEditing, toDoValue } = this.state;
@@ -75,29 +72,7 @@ export default class LottoNumbers extends Component {
       </View>
     );
   }
-  _toggleComplete = event => {
-    event.stopPropagation();
-    const { isCompleted, uncompleteToDo, completeToDo, id } = this.props;
-    if (isCompleted) {
-      uncompleteToDo(id);
-    } else {
-      completeToDo(id);
-    }
-  };
-  _startEditing = event => {
-    event.stopPropagation();
-    this.setState({ isEditing: true });
-  };
-  _finishEditing = event => {
-    event.stopPropagation();
-    const { toDoValue } = this.state;
-    const { id, updateToDo } = this.props;
-    updateToDo(id, toDoValue);
-    this.setState({ isEditing: false });
-  };
-  _controllInput = text => {
-    this.setState({ toDoValue: text });
-  };
+  
 }
 
 const styles = StyleSheet.create({

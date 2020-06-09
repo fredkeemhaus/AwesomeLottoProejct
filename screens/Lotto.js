@@ -1,13 +1,12 @@
 import React, { Component } from "react";
-import { View, Text, TouchableOpacity, AsyncStorage, RefreshControl, SafeAreaView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, AsyncStorage, RefreshControl, SafeAreaView } from "react-native";
 import { item } from "../api";
 import moment from "moment";
 import styled from "styled-components";
 import _ from 'lodash';
 import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
-import uuid from 'uuid'
-
+import { v1 as uuidv1 } from 'uuid';
 
 import {
   AdMobBanner,
@@ -16,7 +15,6 @@ import {
   AdMobRewarded,
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
-import { ScrollView } from "react-native-gesture-handler";
 import LottoNumbers from "../components/LottoNumbers";
 
 
@@ -73,7 +71,7 @@ export default class Lotto extends Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount = async () => {
     try {
       await this.loadHomeData();
       const r = await this._loadToDos();
@@ -119,8 +117,8 @@ export default class Lotto extends Component {
 
   _addLottoNumber = (lottoNumber) => {
       this.setState(prevState => {
-        if (lottoNumber.length !== 0) {
-          const ID = uuid();
+        if (lottoNumber && lottoNumber.length !== 0) {
+          const ID = uuidv1();
           const saveLottoNumberObject = {
             [ID]: {
               id: ID,
@@ -142,7 +140,7 @@ export default class Lotto extends Component {
         }
       })
 
-      alert('저장되었습니다.')
+      // alert('저장되었습니다.')
 
     console.log(this.state, '------------');
   }
@@ -154,20 +152,6 @@ export default class Lotto extends Component {
         saveLottoNumberObject: {
           ...prevState.saveNumbers,
           [id]: { ...prevState.saveNumbers[id], isCompleted: true }
-        }
-      };
-      this._saveNumbers(newState.saveNumbers);
-      return { ...newState };
-    });
-  };
-  
-  _updateToDo = (id, text) => {
-    this.setState(prevState => {
-      const newState = {
-        ...prevState,
-        prevState: {
-          ...prevState.saveNumbers,
-          [id]: { ...prevState.saveNumbers[id], text: text }
         }
       };
       this._saveNumbers(newState.saveNumbers);
@@ -215,7 +199,7 @@ export default class Lotto extends Component {
       const toDos = await AsyncStorage.getItem("toDos");
       const parsedToDos = JSON.parse(toDos)
       console.log(toDos,'asdssss');
-      this.setState({ loadedTodos: true, saveNumbers: parsedToDos})
+      this.setState({ loadedTodos: true, saveNumbers: parsedToDos || {}})
     } catch(e) {
       console.log(e)
     }
@@ -225,30 +209,29 @@ export default class Lotto extends Component {
 
   render() {
     const { drwNumberData, lottoNumber, saveNumbers } = this.state;
-    // const sortArray = lottoNumber && lottoNumber.sort(function(a, b) {
-    //   return a - b
-    // });
+    const sortArray = lottoNumber && lottoNumber.sort(function(a, b) {
+      return a - b
+    });
 
-    console.log(saveNumbers,'------------------------asdasd')
 
     return (
-      <View style={{height: '100%', backgroundColor: '#21243d'}}>
-        <View style={{paddingHorizontal: 30}}>
+      <View style={{ backgroundColor: '#21243d', flex: 1}}>
+        <ScrollView contentContainerStyle={{paddingHorizontal: 30, flex: 1}}>
           <View style={{marginTop: 20}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={{fontWeight: 'bold', color: 'white'}}>오늘 날짜</Text>
               <Text style={{color: 'white'}}>{momentNowDate}</Text>
             </View>
             <View style={{
-              backgroundColor: 'white',
-              padding: 20,
-              borderRadius: 10,
-              marginVertical: 10,
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.5,
+                backgroundColor: 'white',
+                padding: 20,
+                borderRadius: 10,
+                marginVertical: 10,
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.5,
               }}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Text style={{fontWeight: 'normal', fontSize: 14}}>총 당첨인원</Text>
@@ -364,7 +347,7 @@ export default class Lotto extends Component {
             <>
               <View style={{backgroundColor: 'white', padding: 20, borderRadius: 14, marginVertical: 10}}>
                 <NowLottoNumberContainer>
-                  {sortArray.map((v, i) => {
+                  {sortArray && sortArray.map((v, i) => {
                     return (
                       <LottoNumberCircleBoxNumberTicker
                         style={{
@@ -434,7 +417,7 @@ export default class Lotto extends Component {
                 />
             ))}
           </ScrollView>
-        </View>
+        </ScrollView>
         <View style={{width: '100%', position: 'absolute', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"

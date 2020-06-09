@@ -88,7 +88,7 @@ export default class SaveNumber extends Component {
 
   loadSaveData = async () => {
     try {
-      await Tasks.all(saveNumber => this.setState({ saveNumber: saveNumber || [] }));
+      await Tasks.all(saveNumber => this.setState({ saveNumber: saveNumber ||  }));
     } catch(e) {
       console.log(e)
     }
