@@ -183,7 +183,7 @@ export default class SaveNumber extends Component {
         <View style={{width: '100%', position: 'relative', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"
-            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            adUnitID="ca-app-pub-9486850272416310/1415959885" // Test ID, Replace with your-admob-unit-id
             servePersonalizedAds // true or false
             onDidFailToReceiveAdWithError={this.bannerError} />
         </View>
