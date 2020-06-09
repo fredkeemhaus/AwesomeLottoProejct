@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import { View, Text, AppState, TouchableOpacity, AsyncStorage, RefreshControl, SafeAreaView } from "react-native";
+import { View, Text, TouchableOpacity, AsyncStorage, RefreshControl, SafeAreaView } from "react-native";
 import { item } from "../api";
 import moment from "moment";
 import styled from "styled-components";
 import _ from 'lodash';
-import { v1 as uuidv1 } from 'uuid';
 import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
 import uuid from 'uuid'
@@ -20,26 +19,6 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import LottoNumbers from "../components/LottoNumbers";
 
-let Tasks = {
-  convertToArrayOfObject(tasks, callback) {
-    return callback(
-      tasks ? tasks.split("||").map((task, i) => ({ key: i, lottoNumber: task.split(",") })) : []
-    );
-  },
-  convertToStringWithSeparators(tasks) {
-    return tasks.map(task => task.lottoNumber).join("||");
-    // return tasks.map(task => task.lottoNumber).join("||");
-    // return tasks
-  },
-  all(callback) {
-    return AsyncStorage.getItem("TASKS", (err, tasks) =>
-      this.convertToArrayOfObject(tasks, callback)
-    );
-  },
-  save(tasks) {
-    AsyncStorage.setItem("TASKS", this.convertToStringWithSeparators(tasks));
-  }
-};
 
 const NowLottoNumberContainer = styled.View`
   flex-direction: row;
@@ -77,7 +56,6 @@ const LottoNumberCircleBoxNumberTicker = styled.View`
 `
 
 
-
 // background-color: ${props => (props.backgroundCondition ? 'white' : 'transparent')};
 
 const nowDate = new Date();
@@ -95,33 +73,10 @@ export default class Lotto extends Component {
     };
   }
 
-  state: State = {
-    appState: AppState.currentState,
-  };
-
-  async componentWillMount() {
-    AppState.addEventListener('change', async nextAppState => {
-      if (
-        this.state.appState.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        await this.loadHomeData();
-        this.setState({appState: nextAppState});
-      }
-    });
-  }
-  
-  async componentWillReceiveProps(nextProps) {
-    if (this.isOnEnter(nextProps)) {
-      await this.loadHomeData();
-    }
-  }
-
   async componentDidMount() {
     try {
       await this.loadHomeData();
       const r = await this._loadToDos();
-      console.log(r,'---------------')
 
     } catch (e) {
       console.log(e);
@@ -132,8 +87,6 @@ export default class Lotto extends Component {
     let startDate = new Date("2002-12-07");
     let nowDate = new Date();
     let diffDate = nowDate - startDate;
-
-    await Tasks.all(saveNumber => this.setState({ saveNumber: saveNumber || [] }));
 
     const nowDrwDate = parseInt(diffDate / (24 * 60 * 60 * 1000) / 7) + 1;
     let drwNumberData;
@@ -159,7 +112,6 @@ export default class Lotto extends Component {
   }
 
   _numberReturnReset = () => {
-    // let lottoNumber = _.sampleSize(_.range(1, 45), 7)
     this.setState({
       lottoNumber: null
     })
@@ -168,7 +120,7 @@ export default class Lotto extends Component {
   _addLottoNumber = (lottoNumber) => {
       this.setState(prevState => {
         if (lottoNumber.length !== 0) {
-          const ID = uuidv1();
+          const ID = uuid();
           const saveLottoNumberObject = {
             [ID]: {
               id: ID,
@@ -199,9 +151,40 @@ export default class Lotto extends Component {
     this.setState(prevState => {
       const newState = {
         ...prevState,
+        saveLottoNumberObject: {
+          ...prevState.saveNumbers,
+          [id]: { ...prevState.saveNumbers[id], isCompleted: true }
+        }
+      };
+      this._saveNumbers(newState.saveNumbers);
+      return { ...newState };
+    });
+  };
+  
+  _updateToDo = (id, text) => {
+    this.setState(prevState => {
+      const newState = {
+        ...prevState,
+        prevState: {
+          ...prevState.saveNumbers,
+          [id]: { ...prevState.saveNumbers[id], text: text }
+        }
+      };
+      this._saveNumbers(newState.saveNumbers);
+      return { ...newState };
+    });
+  };
+
+  _uncompleteToDo = id => {
+    this.setState(prevState => {
+      const newState = {
+        ...prevState,
         toDos: {
           ...prevState.toDos,
-          [id]: { ...prevState.toDos[id], isCompleted: true }
+          [id]: {
+            ...prevState.toDos[id],
+            isCompleted: false
+          }
         }
       };
       this._saveToDos(newState.toDos);
@@ -238,11 +221,13 @@ export default class Lotto extends Component {
     }
   }
 
+  
+
   render() {
     const { drwNumberData, lottoNumber, saveNumbers } = this.state;
-    const sortArray = lottoNumber && lottoNumber.sort(function(a, b) {
-      return a - b
-    });
+    // const sortArray = lottoNumber && lottoNumber.sort(function(a, b) {
+    //   return a - b
+    // });
 
     console.log(saveNumbers,'------------------------asdasd')
 
@@ -294,74 +279,83 @@ export default class Lotto extends Component {
                 </View>
                 <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
               </View>
-              
-              {/* <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
-                <Text>1등 번호</Text>
-              </View> */}
               <NowLottoNumberContainer>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.5
+                  }}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo1}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo1}
-                    textSize={14}
-                    duration={500}
-                    textStyle={{fontWeight: 'bold'}}
-                    style={{padding: 0, margin: 0}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.5
+                  }}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo2}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo2}
-                    textSize={14}
-                    duration={1000}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.5
+                  }}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo3}</Text>
-                  {/* <NumberTicker
-                      number={drwNumberData && drwNumberData.drwtNo3}
-                      textSize={14}
-                      duration={1500}
-                      textStyle={{fontWeight: 'bold'}}
-                    /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.5
+                  }}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo4}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo4}
-                    textSize={14}
-                    duration={2000}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.5
+                  }}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo5}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo5}
-                    textSize={14}
-                    duration={2500}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.5
+                  }}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo6}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo6}
-                    textSize={14}
-                    duration={3000}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.5
+                  }}
+                >
                   <Text>{drwNumberData && drwNumberData.bnusNo}</Text>
-                    {/* <NumberTicker
-                      number={drwNumberData && drwNumberData.bnusNo}
-                      textSize={14}
-                      duration={3500}
-                      textStyle={{fontWeight: 'bold'}}
-                    /> */}
                 </LottoNumberCircleBox>
               </NowLottoNumberContainer>
             </View>
@@ -372,7 +366,15 @@ export default class Lotto extends Component {
                 <NowLottoNumberContainer>
                   {sortArray.map((v, i) => {
                     return (
-                      <LottoNumberCircleBoxNumberTicker>
+                      <LottoNumberCircleBoxNumberTicker
+                        style={{
+                          shadowOffset: {
+                            width: 0,
+                            height: 2,
+                          },
+                          shadowOpacity: 0.5,
+                        }}
+                      >
                         <NumberTicker
                           number={lottoNumber[i]}
                           textSize={14}
@@ -413,18 +415,23 @@ export default class Lotto extends Component {
                   width: 0,
                   height: 2,
                 },
-                shadowOpacity: 0.5
+                shadowOpacity: 0.5,
+                marginBottom: 10
               }}
               onPress={() => this._numberReturn()}
             >
-              <Text style={{fontWeight: 'bold'}}>
+              <Text style={{fontWeight: 'bold', fontSize: 16}}>
                 번호 뽑기
               </Text>
             </TouchableOpacity>
           )}
           <ScrollView>
             {Object.values(saveNumbers).map( number => (
-              <LottoNumbers key={number.id} {...number} deleteNumber={this._deleteNumber} />
+              <LottoNumbers 
+                  key={number.id}
+                  deleteNumber={this._deleteNumber}
+                  {...number}
+                />
             ))}
           </ScrollView>
         </View>

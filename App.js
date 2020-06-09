@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AppLoading } from "expo";
+import { AppLoading, loadAssets } from "expo";
 import * as Font from "expo-font";
 import { Image } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -20,7 +20,7 @@ const cacheFonts = fonts => fonts.map(font => Font.loadAsync(font));
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
-  const loadAssets = () => {
+  const loadAssets = async () => {
     const images = cacheImages([require("./assets/splash.png")]);
     const fonts = cacheFonts([Ionicons.font]);
 

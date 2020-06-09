@@ -8,8 +8,19 @@ import {
   TextInput
 } from "react-native";
 import PropTypes from "prop-types";
+import styled from 'styled-components'
 
 const { width, height } = Dimensions.get("window");
+
+const LottoNumberCircleBox = styled.View`
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+`
 
 export default class LottoNumbers extends Component {
   constructor(props) {
@@ -27,67 +38,28 @@ export default class LottoNumbers extends Component {
   };
   render() {
     const { isEditing, toDoValue } = this.state;
-    const { number, id, deleteNumber, isCompleted } = this.props;
+    const { number, id, deleteNumber, isCompleted, uncompleteToDo, completeToDo } = this.props;
     return (
       <View style={styles.container}>
         <View style={styles.column}>
-          <TouchableOpacity onPress={this._toggleComplete}>
-            <View
-              style={[
-                styles.circle,
-                isCompleted ? styles.completedCircle : styles.uncompletedCircle
-              ]}
-            />
-          </TouchableOpacity>
-          {isEditing ? (
-            <TextInput
-              style={[
-                styles.text,
-                styles.input,
-                isCompleted ? styles.completedText : styles.uncompletedText
-              ]}
-              value={toDoValue}
-              multiline={true}
-              onChangeText={this._controllInput}
-              returnKeyType={"done"}
-              onBlur={this._finishEditing}
-              underlineColorAndroid={"transparent"}
-            />
-          ) : (
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                {number && number.map((v) => {
-                    return (
-                        <>
-                            <Text
-                                style={[
-                                        styles.text,
-                                        isCompleted ? styles.completedText : styles.uncompletedText
-                                    ]}
-                                >
-                                    {v}
-                            </Text>
-                        </>
-                    )
-                })}
-            </View>
-          )}
-        </View>
-
-        {isEditing ? (
-          <View style={styles.actions}>
-            <TouchableOpacity onPressOut={this._finishEditing}>
-              <View style={styles.actionContainer}>
-                <Text style={styles.actionText}>✅</Text>
-              </View>
-            </TouchableOpacity>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+              {number && number.map((v) => {
+                  return (
+                      <LottoNumberCircleBox>
+                          <Text
+                              style={[
+                                      // styles.text,
+                                      // isCompleted ? styles.completedText : styles.uncompletedText
+                                      // styles.uncompletedText
+                                  ]}
+                              >
+                                  {v}
+                          </Text>
+                      </LottoNumberCircleBox>
+                  )
+              })}
           </View>
-        ) : (
           <View style={styles.actions}>
-            {/* <TouchableOpacity onPressOut={this._startEditing}>
-              <View style={styles.actionContainer}>
-                <Text style={styles.actionText}>✏️</Text>
-              </View>
-            </TouchableOpacity> */}
             <TouchableOpacity
               onPressOut={event => {
                 event.stopPropagation;
@@ -99,7 +71,7 @@ export default class LottoNumbers extends Component {
               </View>
             </TouchableOpacity>
           </View>
-        )}
+        </View>
       </View>
     );
   }
@@ -130,12 +102,13 @@ export default class LottoNumbers extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    width: width - 50,
+    width: '100%',
     borderBottomColor: "#bbb",
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    paddingVertical: 10
   },
   circle: {
     width: 30,
@@ -167,10 +140,10 @@ const styles = StyleSheet.create({
   column: {
     flexDirection: "row",
     alignItems: "center",
-    width: width / 2
+    
   },
   actions: {
-    flexDirection: "row"
+    flexDirection: "row",
   },
   actionContainer: {
     marginVertical: 10,

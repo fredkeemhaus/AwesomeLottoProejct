@@ -1,7 +1,7 @@
 import React, {Component, useEffect} from "react";
 import styled from "styled-components";
 import { View, Text, AsyncStorage, TouchableOpacity, AppState, ScrollView } from "react-native";
-import { AntDesign } from '@expo/vector-icons'; 
+import { AntDesign, FontAwesome } from '@expo/vector-icons'; 
 import {
   AdMobBanner,
   AdMobInterstitial,
@@ -10,6 +10,7 @@ import {
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
 import LottoNumbers from "../components/LottoNumbers";
+import _ from 'lodash'
 
 
 let Tasks = {
@@ -130,6 +131,23 @@ export default class SaveNumber extends Component {
     }
   }
 
+  _deleteNumber = (id) => {
+    this.setState(prevState => {
+      const saveNumbers = prevState.saveNumbers;
+      delete saveNumbers[id];
+      const newState = {
+        ...prevState,
+        ...saveNumbers
+      }
+      this._saveNumbers(newState.saveNumbers)
+      return {...newState}
+    })
+  }
+
+  _saveNumbers = (newTodos) => {
+    const saveTodos = AsyncStorage.setItem("toDos", JSON.stringify(newTodos));
+  }
+
   render() {
     const {saveNumber, saveNumbers} = this.state;
     console.log(saveNumbers, 'asd')
@@ -137,53 +155,20 @@ export default class SaveNumber extends Component {
     
     return (
       <View style={{height: '100%', backgroundColor: '#21243d'}}>
-        <ScrollView style={{width: '100%', paddingHorizontal: 30}}>
+        {!_.isEmpty(saveNumbers) ? (
+          <ScrollView style={{width: '100%', paddingHorizontal: 30}}>
             {Object.values(saveNumbers).map( number => (
-              <LottoNumbers key={number.id} {...number}
-                // deleteNumber={this._deleteNumber}
-                />
+              <LottoNumbers key={number.id} {...number} deleteNumber={this._deleteNumber} />
             ))}
           </ScrollView>
-        {saveNumber ? (
-          <ScrollView style={{paddingHorizontal: 30, marginTop: 10}}>
-            {saveNumber && saveNumber.map((v, i) => {
-              console.log(v, '0')
-              return (
-                <LottoNumberContainerWrap
-                  style={{
-                    shadowOffset: {
-                      width: 0,
-                      height: 2,
-                    },
-                    shadowOpacity: 0.5
-                  }}
-                >
-                  <NowLottoNumberContainer>
-                    {v.lottoNumber && v.lottoNumber.map((item, i) => {
-                      console.log(item, i, 'asdsd')
-                      return (
-                        <LottoNumberCircleBox>
-                          <Text>{item}</Text>
-                        </LottoNumberCircleBox>
-                      )
-                    })}
-                    
-                    <TouchableOpacity style={{width: 30, height: 30, justifyContent: 'center', alignItems: 'center', borderRadius: 30, borderWidth: 2, borderColor: 'black' }} onPress={() => this.deleteTask(i)}>
-                      <AntDesign name="delete" size={18} color="black" />
-                    </TouchableOpacity>
-                  </NowLottoNumberContainer>
-                </LottoNumberContainerWrap>
-              )
-            })}
-          </ScrollView>
         ) : (
-          <View>
-            <Text>저장된 번호가 없습니다!.</Text>
+          <View style={{width: '100%', flex: 1, justifyContent: "center", alignItems: 'center'}}>
+            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 18}}>저장된 번호가 없습니다!</Text>
           </View>
         )}
-        <View>
-          <TouchableOpacity onPress={this._refreshButton}>
-            <Text>asd</Text>
+        <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 30, marginBottom: 10}}>
+          <TouchableOpacity style={{width: 40, height: 40, paddingLeft: 1, backgroundColor: 'white', borderRadius: 40, justifyContent: 'center', alignItems: "center"}} onPress={this._refreshButton}>
+            <FontAwesome name="refresh" size={24} color="black" />
           </TouchableOpacity>
         </View>
         <View style={{width: '100%', position: 'relative', bottom: 0}}>

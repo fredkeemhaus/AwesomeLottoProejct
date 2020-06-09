@@ -37,13 +37,13 @@ export default ({ navigation, route }) => {
             textName === route.name;
           } 
           return (
-            <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', paddingVertical: 5}}>
+            <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
               <SimpleLineIcons
                 name={iconName}
                 color={focused ? "white" : "grey"}
                 size={26}
               />
-              <Text style={{color: focused ? "white" : "grey", fontSize: 10, paddingTop: 5}}>{route.name}</Text>
+              <Text style={{color: focused ? "white" : "grey", fontSize: 10}}>{route.name}</Text>
             </View>
           );
         }
@@ -53,7 +53,6 @@ export default ({ navigation, route }) => {
         style: {
           backgroundColor: "#21243d",
           borderTopColor: "#21243d",
-          paddingVertical: 20
         }
       }}
     >
