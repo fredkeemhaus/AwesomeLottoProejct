@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { v1 as uuidv1 } from 'uuid';
 import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
+import uuid from 'uuid'
 
 
 import {
@@ -16,6 +17,8 @@ import {
   AdMobRewarded,
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
+import { ScrollView } from "react-native-gesture-handler";
+import LottoNumbers from "../components/LottoNumbers";
 
 let Tasks = {
   convertToArrayOfObject(tasks, callback) {
@@ -87,7 +90,8 @@ export default class Lotto extends Component {
       drwNumberData: null,
       lottoNumber: null,
       saveNumber: [],
-      saveLottoNumber: ''
+      saveLottoNumber: '',
+      saveNumbers: {}
     };
   }
 
@@ -116,6 +120,9 @@ export default class Lotto extends Component {
   async componentDidMount() {
     try {
       await this.loadHomeData();
+      const r = await this._loadToDos();
+      console.log(r,'---------------')
+
     } catch (e) {
       console.log(e);
     }
@@ -159,28 +166,85 @@ export default class Lotto extends Component {
   }
 
   _addLottoNumber = (lottoNumber) => {
-    // console.log(lottoNumber, 'add')
-      this.setState(
-          prevState => {
-            let { saveNumber, saveLottoNumber } = prevState;
-            return {
-              saveNumber: saveNumber.concat({ key: saveNumber.length, lottoNumber: lottoNumber }),
-              lottoNumber: null
-            };
-          },
-          () => Tasks.save(this.state.saveNumber)
-      );
+      this.setState(prevState => {
+        if (lottoNumber.length !== 0) {
+          const ID = uuidv1();
+          const saveLottoNumberObject = {
+            [ID]: {
+              id: ID,
+              isCompleted: false,
+              number: lottoNumber,
+              createdAt: Date.now()
+            }
+          };
+          const newState = {
+            ...prevState,
+            lottoNumber: [],
+            saveNumbers: {
+              ...prevState.saveNumbers,
+              ...saveLottoNumberObject
+            }
+          }
+          this._saveNumbers(newState.saveNumbers)
+          return {...newState}
+        }
+      })
 
       alert('저장되었습니다.')
 
     console.log(this.state, '------------');
   }
 
+  _completeToDo = id => {
+    this.setState(prevState => {
+      const newState = {
+        ...prevState,
+        toDos: {
+          ...prevState.toDos,
+          [id]: { ...prevState.toDos[id], isCompleted: true }
+        }
+      };
+      this._saveToDos(newState.toDos);
+      return { ...newState };
+    });
+  };
+
+  _deleteNumber = (id) => {
+    this.setState(prevState => {
+      const saveNumbers = prevState.saveNumbers;
+      delete saveNumbers[id];
+      const newState = {
+        ...prevState,
+        ...saveNumbers
+      }
+      this._saveNumbers(newState.saveNumbers)
+      return {...newState}
+    })
+  }
+
+  _saveNumbers = (newTodos) => {
+    const saveTodos = AsyncStorage.setItem("toDos", JSON.stringify(newTodos));
+  }
+
+
+  _loadToDos = async () => {
+    try {
+      const toDos = await AsyncStorage.getItem("toDos");
+      const parsedToDos = JSON.parse(toDos)
+      console.log(toDos,'asdssss');
+      this.setState({ loadedTodos: true, saveNumbers: parsedToDos})
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
   render() {
-    const { drwNumberData, lottoNumber } = this.state;
+    const { drwNumberData, lottoNumber, saveNumbers } = this.state;
     const sortArray = lottoNumber && lottoNumber.sort(function(a, b) {
       return a - b
     });
+
+    console.log(saveNumbers,'------------------------asdasd')
 
     return (
       <View style={{height: '100%', backgroundColor: '#21243d'}}>
@@ -302,7 +366,7 @@ export default class Lotto extends Component {
               </NowLottoNumberContainer>
             </View>
           </View>
-          {lottoNumber ? (
+          {lottoNumber && lottoNumber.length !== 0 ? (
             <>
               <View style={{backgroundColor: 'white', padding: 20, borderRadius: 14, marginVertical: 10}}>
                 <NowLottoNumberContainer>
@@ -358,11 +422,16 @@ export default class Lotto extends Component {
               </Text>
             </TouchableOpacity>
           )}
+          <ScrollView>
+            {Object.values(saveNumbers).map( number => (
+              <LottoNumbers key={number.id} {...number} deleteNumber={this._deleteNumber} />
+            ))}
+          </ScrollView>
         </View>
         <View style={{width: '100%', position: 'absolute', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"
-            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            adUnitID="ca-app-pub-9486850272416310/1415959885" // Test ID, Replace with your-admob-unit-id
             servePersonalizedAds // true or false
             onDidFailToReceiveAdWithError={this.bannerError} />
         </View>

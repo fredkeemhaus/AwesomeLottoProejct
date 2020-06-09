@@ -1,6 +1,6 @@
 import React, {Component, useEffect} from "react";
 import styled from "styled-components";
-import { View, Text, AsyncStorage, TouchableOpacity, AppState } from "react-native";
+import { View, Text, AsyncStorage, TouchableOpacity, AppState, ScrollView } from "react-native";
 import { AntDesign } from '@expo/vector-icons'; 
 import {
   AdMobBanner,
@@ -9,8 +9,7 @@ import {
   AdMobRewarded,
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
-import { ScrollView } from "react-native-gesture-handler";
-import SaveNumberCompo from '../components/saveNumber'
+import LottoNumbers from "../components/LottoNumbers";
 
 
 let Tasks = {
@@ -61,7 +60,8 @@ export default class SaveNumber extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      saveNumber: []
+      saveNumber: [],
+      saveNumbers: {}
     };
   }
 
@@ -69,10 +69,13 @@ export default class SaveNumber extends Component {
   async componentDidMount() {
     try {
       await this.loadSaveData();
+      const r = await this._loadToDos();
+      console.log(r,'----')
     } catch(e) {
       console.log(e)
     }
   };
+  
   
   async componentWillReceiveProps(nextProps) {
     if (this.isOnEnter(nextProps)) {
@@ -107,15 +110,41 @@ export default class SaveNumber extends Component {
     alert('삭제되었습니다.')
   };
 
+  _loadToDos = async () => {
+    try {
+      const toDos = await AsyncStorage.getItem("toDos");
+      console.log(toDos,'-')
+      const parsedToDos = JSON.parse(toDos)
+      console.log(toDos,'asdssss');
+      this.setState({ loadedTodos: true, saveNumbers: parsedToDos})
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  _refreshButton = async () => {
+    try {
+      await this._loadToDos();
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
   render() {
-    const {saveNumber} = this.state;
-    console.log(saveNumber, 'asd')
+    const {saveNumber, saveNumbers} = this.state;
+    console.log(saveNumbers, 'asd')
     // console.log(saveNumber, 'sad')
     
     return (
       <View style={{height: '100%', backgroundColor: '#21243d'}}>
-        <SaveNumberCompo />
-        {/* {saveNumber && saveNumber.length !== 0 ? (
+        <ScrollView style={{width: '100%', paddingHorizontal: 30}}>
+            {Object.values(saveNumbers).map( number => (
+              <LottoNumbers key={number.id} {...number}
+                // deleteNumber={this._deleteNumber}
+                />
+            ))}
+          </ScrollView>
+        {saveNumber ? (
           <ScrollView style={{paddingHorizontal: 30, marginTop: 10}}>
             {saveNumber && saveNumber.map((v, i) => {
               console.log(v, '0')
@@ -148,14 +177,19 @@ export default class SaveNumber extends Component {
             })}
           </ScrollView>
         ) : (
-          <ScrollView contentContainerStyle={{justifyContent: "center", alignItems: 'center', height: '100%'}}>
-            <Text style={{color: 'white'}}>저장된 번호가 없습니다!.</Text>
-          </ScrollView>
-        )} */}
+          <View>
+            <Text>저장된 번호가 없습니다!.</Text>
+          </View>
+        )}
+        <View>
+          <TouchableOpacity onPress={this._refreshButton}>
+            <Text>asd</Text>
+          </TouchableOpacity>
+        </View>
         <View style={{width: '100%', position: 'relative', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"
-            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            adUnitID="ca-app-pub-9486850272416310/1415959885" // Test ID, Replace with your-admob-unit-id
             servePersonalizedAds // true or false
             onDidFailToReceiveAdWithError={this.bannerError} />
         </View>

@@ -2,7 +2,14 @@ import React, { Component } from 'react';
 import {View, Text, Animated, TouchableOpacity} from 'react-native';
 import styled from 'styled-components';
 import _ from 'lodash'
-
+import {
+    AdMobBanner,
+    AdMobInterstitial,
+    PublisherBanner,
+    AdMobRewarded,
+    setTestDeviceIDAsync,
+  } from 'expo-ads-admob';
+  
 const GridContainer = styled.View`
     padding: 30px;
     flex-direction: row;
@@ -177,6 +184,13 @@ export default class SlotLotto extends Component {
                         
                     </View>
                 )}
+                <View style={{width: '100%', position: 'absolute', bottom: 0}}>
+                    <AdMobBanner
+                        bannerSize="fullBanner"
+                        adUnitID="ca-app-pub-9486850272416310/1415959885" // Test ID, Replace with your-admob-unit-id
+                        servePersonalizedAds // true or false
+                        onDidFailToReceiveAdWithError={this.bannerError} />
+                </View>
             </View>
         )
     }

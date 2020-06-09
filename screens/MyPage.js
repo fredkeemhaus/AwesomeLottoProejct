@@ -20,7 +20,7 @@ export default class MyPage extends Component {
 
   componentDidMount = async () => {
     try {
-      await AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917'); // Test ID, Replace with your-admob-unit-id
+      await AdMobRewarded.setAdUnitID('ca-app-pub-9486850272416310/1415959885'); // Test ID, Replace with your-admob-unit-id
       await AdMobRewarded.requestAdAsync();
       await AdMobRewarded.showAdAsync();
     } catch(e){
