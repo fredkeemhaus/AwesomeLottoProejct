@@ -1,7 +1,9 @@
 import React, {Component, useEffect} from "react";
 import styled from "styled-components";
 import { View, Text, AsyncStorage, TouchableOpacity, AppState } from "react-native";
-import { AntDesign } from '@expo/vector-icons'; 
+import { AntDesign, Feather } from '@expo/vector-icons'; 
+
+
 import {
   AdMobBanner,
   AdMobInterstitial,
@@ -10,7 +12,6 @@ import {
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
 import { ScrollView } from "react-native-gesture-handler";
-import SaveNumberCompo from '../components/saveNumber'
 
 
 let Tasks = {
@@ -68,6 +69,7 @@ export default class SaveNumber extends Component {
 
   async componentDidMount() {
     try {
+      // AsyncStorage.clear()
       await this.loadSaveData();
     } catch(e) {
       console.log(e)
@@ -93,19 +95,30 @@ export default class SaveNumber extends Component {
   }
 
   deleteTask = i => {
+    console.log(i, 'delete')
     this.setState(
       prevState => {
         let saveNumber = prevState.saveNumber.slice();
+        let newArray = [...saveNumber];
 
-        saveNumber.splice(i, 1);
-
-        return { saveNumber: saveNumber };
+        newArray.splice(i, 1);
+        this.setState({ saveNumber: newArray });
+        // return { saveNumber: saveNumber };
       },
       () => Tasks.save(this.state.saveNumber)
+      
     );
-    
+    console.log(this.state.saveNumber,'===')
     alert('삭제되었습니다.')
   };
+  
+  refreshTask = async () => {
+    try {
+      await this.loadSaveData()
+    } catch(e) {
+      console.log(e)
+    }
+  }
 
   render() {
     const {saveNumber} = this.state;
@@ -114,8 +127,7 @@ export default class SaveNumber extends Component {
     
     return (
       <View style={{height: '100%', backgroundColor: '#21243d'}}>
-        <SaveNumberCompo />
-        {/* {saveNumber && saveNumber.length !== 0 ? (
+        {saveNumber && saveNumber.length !== 0 ? (
           <ScrollView style={{paddingHorizontal: 30, marginTop: 10}}>
             {saveNumber && saveNumber.map((v, i) => {
               console.log(v, '0')
@@ -151,7 +163,12 @@ export default class SaveNumber extends Component {
           <ScrollView contentContainerStyle={{justifyContent: "center", alignItems: 'center', height: '100%'}}>
             <Text style={{color: 'white'}}>저장된 번호가 없습니다!.</Text>
           </ScrollView>
-        )} */}
+        )}
+        <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 30, paddingVertical: 20}}>
+          <TouchableOpacity style={{width: 40, height: 40, justifyContent: 'center', alignItems: 'center', borderRadius: 40, borderWidth: 2, borderColor: 'black', backgroundColor: 'white' }} onPress={() => this.refreshTask()}>
+            <Feather name="refresh-ccw" size={18} color="black" />
+          </TouchableOpacity>
+        </View>
         <View style={{width: '100%', position: 'relative', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"

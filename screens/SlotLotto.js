@@ -80,7 +80,7 @@ export default class SlotLotto extends Component {
 
     render () {
         const {startGameWin, number, startGameSetWinRandom, startGameState} = this.state;
-        console.log(this.state.startGameSetWinRandom, '-')
+
         return (
             <View style={{backgroundColor: '#21243d', height: '100%'}}>
                 {!startGameState && (
@@ -133,7 +133,7 @@ export default class SlotLotto extends Component {
                                     shadowOpacity: 0.5
                                 }}
                             >
-                                <Text style={{color: 'white', fontSize: 16, fontWeight: 'bold'}}>게임 시작하기</Text>
+                                <Text style={{color: 'white', fontSize: 14, fontWeight: 'bold'}}>번호 뽑기</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -156,7 +156,9 @@ export default class SlotLotto extends Component {
                                         > */}
                                             <GameSetText
                                                 includeWin={includeWin}
-                                            >{number[i]}</GameSetText>
+                                            >
+                                                {number[i]}
+                                            </GameSetText>
                                         {/* </TouchableOpacity> */}
                                     </GameSetCircle>
                                 )

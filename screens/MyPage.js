@@ -29,9 +29,14 @@ export default class MyPage extends Component {
   }
 
   render() {
+    let startDate = new Date("2002-12-07");
+    let nowDate = new Date();
+    let diffDate = nowDate - startDate;
+    
+    const nowDrwDate = parseInt(diffDate / (24 * 60 * 60 * 1000) / 7) + 1;
     return (
       <WebView
-        source={{ uri: 'https://m.dhlottery.co.kr/gameResult.do?method=byWin&drwNo=908&wiselog=M_A_1_1'}}
+        source={{ uri: `https://m.dhlottery.co.kr/gameResult.do?method=byWin&drwNo=${nowDrwDate}`}}
       />
     )
   }

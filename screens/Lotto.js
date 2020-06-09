@@ -57,11 +57,23 @@ const LottoNumberCircleBox = styled.View`
   background-color: white;
   justify-content: center;
   align-items: center;
-  /* padding-right: 8px; */
-  padding-bottom: 2px;
+  
   border-radius: 30px;
   box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
 `
+
+const LottoNumberCircleBoxNumberTicker = styled.View`
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 2px;  
+  border-radius: 30px;
+  box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+`
+
+
 
 // background-color: ${props => (props.backgroundCondition ? 'white' : 'transparent')};
 
@@ -139,6 +151,13 @@ export default class Lotto extends Component {
     })
   }
 
+  _numberReturnReset = () => {
+    // let lottoNumber = _.sampleSize(_.range(1, 45), 7)
+    this.setState({
+      lottoNumber: null
+    })
+  }
+
   _addLottoNumber = (lottoNumber) => {
     // console.log(lottoNumber, 'add')
       this.setState(
@@ -174,7 +193,7 @@ export default class Lotto extends Component {
             <View style={{
               backgroundColor: 'white',
               padding: 20,
-              borderRadius: 14,
+              borderRadius: 10,
               marginVertical: 10,
               shadowOffset: {
                 width: 0,
@@ -194,7 +213,7 @@ export default class Lotto extends Component {
             <View style={{
               backgroundColor: 'white',
               padding: 20,
-              borderRadius: 14,
+              borderRadius: 10,
               marginVertical: 10,
               shadowOffset: {
                 width: 0,
@@ -205,11 +224,16 @@ export default class Lotto extends Component {
               <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
                 <Text>{drwNumberData && drwNumberData.drwNo} 회차</Text>
               </View>
-
-              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
+                <View style={{justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+                  <Text>1등 당첨금</Text>
+                </View>
                 <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
               </View>
               
+              {/* <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
+                <Text>1등 번호</Text>
+              </View> */}
               <NowLottoNumberContainer>
                 <LottoNumberCircleBox>
                   <Text>{drwNumberData && drwNumberData.drwtNo1}</Text>
@@ -284,24 +308,30 @@ export default class Lotto extends Component {
                 <NowLottoNumberContainer>
                   {sortArray.map((v, i) => {
                     return (
-                      <LottoNumberCircleBox>
+                      <LottoNumberCircleBoxNumberTicker>
                         <NumberTicker
                           number={lottoNumber[i]}
                           textSize={14}
                           duration={i * 1000}
                           textStyle={{fontWeight: 'bold'}}
                         />
-                      </LottoNumberCircleBox>
+                      </LottoNumberCircleBoxNumberTicker>
                     )
                   })}
                 </NowLottoNumberContainer>
               </View>
-              <View>
+              <View style={{flexDirection: 'row', justifyContent: 'flex-end', width: '100%'}}>
                 <TouchableOpacity
-                  style={{flexDirection: 'row', justifyContent: 'flex-end', width: '100%'}}
+                  style={{flexDirection: 'row',}}
+                  onPress={() => this._numberReturnReset()}
+                >
+                  <Text style={{color: 'white', fontWeight: 'bold'}}>초기화</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{flexDirection: 'row', marginLeft: 10}}
                   onPress={() => this._addLottoNumber(lottoNumber)}
                 >
-                  <Text>저장하기</Text>
+                  <Text style={{color: 'white', fontWeight: 'bold'}}>저장하기</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -312,7 +342,7 @@ export default class Lotto extends Component {
                 marginTop: 10,
                 height: 45,
                 backgroundColor: 'white',
-                borderRadius: 14,
+                borderRadius: 10,
                 justifyContent: 'center',
                 alignItems: "center",
                 shadowOffset: {
@@ -321,9 +351,9 @@ export default class Lotto extends Component {
                 },
                 shadowOpacity: 0.5
               }}
-              onPress={this._numberReturn}
+              onPress={() => this._numberReturn()}
             >
-              <Text>
+              <Text style={{fontWeight: 'bold'}}>
                 번호 뽑기
               </Text>
             </TouchableOpacity>
