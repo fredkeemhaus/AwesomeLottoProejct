@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, AppState, TouchableOpacity, AsyncStorage, RefreshControl, SafeAreaView } from "react-native";
+import { View, Text, TouchableOpacity, AsyncStorage, RefreshControl, SafeAreaView, Platform, ScrollView } from "react-native";
 import { item } from "../api";
 import moment from "moment";
 import styled from "styled-components";
@@ -17,26 +17,6 @@ import {
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
 
-let Tasks = {
-  convertToArrayOfObject(tasks, callback) {
-    return callback(
-      tasks ? tasks.split("||").map((task, i) => ({ key: i, lottoNumber: task.split(",") })) : []
-    );
-  },
-  convertToStringWithSeparators(tasks) {
-    return tasks.map(task => task.lottoNumber).join("||");
-    // return tasks.map(task => task.lottoNumber).join("||");
-    // return tasks
-  },
-  all(callback) {
-    return AsyncStorage.getItem("TASKS", (err, tasks) =>
-      this.convertToArrayOfObject(tasks, callback)
-    );
-  },
-  save(tasks) {
-    AsyncStorage.setItem("TASKS", this.convertToStringWithSeparators(tasks));
-  }
-};
 
 const NowLottoNumberContainer = styled.View`
   flex-direction: row;
@@ -79,27 +59,6 @@ export default class Lotto extends Component {
     };
   }
 
-  state: State = {
-    appState: AppState.currentState,
-  };
-
-  async componentWillMount() {
-    AppState.addEventListener('change', async nextAppState => {
-      if (
-        this.state.appState.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        await this.loadHomeData();
-        this.setState({appState: nextAppState});
-      }
-    });
-  }
-  
-  async componentWillReceiveProps(nextProps) {
-    if (this.isOnEnter(nextProps)) {
-      await this.loadHomeData();
-    }
-  }
 
   async componentDidMount() {
     try {
@@ -113,8 +72,6 @@ export default class Lotto extends Component {
     let startDate = new Date("2002-12-07");
     let nowDate = new Date();
     let diffDate = nowDate - startDate;
-
-    await Tasks.all(saveNumber => this.setState({ saveNumber: saveNumber || [] }));
 
     const nowDrwDate = parseInt(diffDate / (24 * 60 * 60 * 1000) / 7) + 1;
     let drwNumberData;
@@ -140,21 +97,6 @@ export default class Lotto extends Component {
   }
 
   _addLottoNumber = (lottoNumber) => {
-    // console.log(lottoNumber, 'add')
-      this.setState(
-          prevState => {
-            let { saveNumber, saveLottoNumber } = prevState;
-            return {
-              saveNumber: saveNumber.concat({ key: saveNumber.length, lottoNumber: lottoNumber }),
-              lottoNumber: null
-            };
-          },
-          () => Tasks.save(this.state.saveNumber)
-      );
-
-      alert('저장되었습니다.')
-
-    console.log(this.state, '------------');
   }
 
   render() {
@@ -165,7 +107,7 @@ export default class Lotto extends Component {
 
     return (
       <View style={{height: '100%', backgroundColor: '#21243d'}}>
-        <View style={{paddingHorizontal: 30}}>
+        <ScrollView contentContainerStyle={{paddingHorizontal: 30}}>
           <View style={{marginTop: 20}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={{fontWeight: 'bold', color: 'white'}}>오늘 날짜</Text>
@@ -192,15 +134,15 @@ export default class Lotto extends Component {
               </View>
             </View>
             <View style={{
-              backgroundColor: 'white',
-              padding: 20,
-              borderRadius: 14,
-              marginVertical: 10,
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.5
+                backgroundColor: 'white',
+                padding: 20,
+                borderRadius: 14,
+                marginVertical: 10,
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.5
               }}>
               <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
                 <Text>{drwNumberData && drwNumberData.drwNo} 회차</Text>
@@ -209,71 +151,51 @@ export default class Lotto extends Component {
               <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
                 <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
               </View>
+              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
+                <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
+              </View>
+              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
+                <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
+              </View>
+              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
+                <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
+              </View>
               
               <NowLottoNumberContainer>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{elevation: Platform.OS === 'ios' ? 0 : 3}}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo1}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo1}
-                    textSize={14}
-                    duration={500}
-                    textStyle={{fontWeight: 'bold'}}
-                    style={{padding: 0, margin: 0}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{elevation: Platform.OS === 'ios' ? 0 : 3}}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo2}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo2}
-                    textSize={14}
-                    duration={1000}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{elevation: Platform.OS === 'ios' ? 0 : 3}}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo3}</Text>
-                  {/* <NumberTicker
-                      number={drwNumberData && drwNumberData.drwtNo3}
-                      textSize={14}
-                      duration={1500}
-                      textStyle={{fontWeight: 'bold'}}
-                    /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{elevation: Platform.OS === 'ios' ? 0 : 3}}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo4}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo4}
-                    textSize={14}
-                    duration={2000}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{elevation: Platform.OS === 'ios' ? 0 : 3}}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo5}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo5}
-                    textSize={14}
-                    duration={2500}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{elevation: Platform.OS === 'ios' ? 0 : 3}}
+                >
                   <Text>{drwNumberData && drwNumberData.drwtNo6}</Text>
-                  {/* <NumberTicker
-                    number={drwNumberData && drwNumberData.drwtNo6}
-                    textSize={14}
-                    duration={3000}
-                    textStyle={{fontWeight: 'bold'}}
-                  /> */}
                 </LottoNumberCircleBox>
-                <LottoNumberCircleBox>
+                <LottoNumberCircleBox
+                  style={{elevation: Platform.OS === 'ios' ? 0 : 3}}
+                >
                   <Text>{drwNumberData && drwNumberData.bnusNo}</Text>
-                    {/* <NumberTicker
-                      number={drwNumberData && drwNumberData.bnusNo}
-                      textSize={14}
-                      duration={3500}
-                      textStyle={{fontWeight: 'bold'}}
-                    /> */}
                 </LottoNumberCircleBox>
               </NowLottoNumberContainer>
             </View>
@@ -298,7 +220,7 @@ export default class Lotto extends Component {
               </View>
               <View>
                 <TouchableOpacity
-                  style={{flexDirection: 'row', justifyContent: 'flex-end', width: '100%'}}
+                  style={{flexDirection: 'row', justifyContent: 'flex-end', width: '100%', marginBottom: 20}}
                   onPress={() => this._addLottoNumber(lottoNumber)}
                 >
                   <Text>저장하기</Text>
@@ -319,7 +241,8 @@ export default class Lotto extends Component {
                   width: 0,
                   height: 2,
                 },
-                shadowOpacity: 0.5
+                shadowOpacity: 0.5,
+                marginBottom: 20
               }}
               onPress={this._numberReturn}
             >
@@ -328,8 +251,8 @@ export default class Lotto extends Component {
               </Text>
             </TouchableOpacity>
           )}
-        </View>
-        <View style={{width: '100%', position: 'absolute', bottom: 0}}>
+        </ScrollView>
+        <View style={{width: '100%', position: 'relative', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"
             adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
