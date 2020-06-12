@@ -8,7 +8,7 @@ import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
 // import { v1 as uuidv1 } from 'uuid';
 import * as Random from 'expo-random';
-// import uuid from 'react-native-uuid';
+import uuid from 'react-native-uuid';
 
 import {
   AdMobBanner,
@@ -120,8 +120,8 @@ export default class Lotto extends Component {
   _addLottoNumber = (lottoNumber) => {
       this.setState(prevState => {
         if (lottoNumber && lottoNumber.length !== 0) {
-          const ID = Random.getRandomBytesAsync(64);
-          // const ID =  uuid.v4();
+          // const ID = Random.getRandomBytesAsync(64);
+          const ID =  uuid.v4();
           const saveLottoNumberObject = {
             [ID]: {
               id: ID,
