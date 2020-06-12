@@ -18,13 +18,16 @@
     "expo-ads-admob": "^8.1.0",
     "expo-asset": "~8.0.0",
     "expo-font": "~8.0.0",
+    "expo-random": "^8.1.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "nanoid": "^3.1.9",
     "numeral": "^2.0.6",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
     "react-native-gesture-handler": "~1.5.0",
+    "react-native-get-random-values": "^1.4.0",
     "react-native-number-ticker": "^0.1.5",
     "react-native-reanimated": "~1.4.0",
     "react-native-safe-area-context": "0.6.0",
@@ -32,7 +35,8 @@
     "react-native-web": "~0.11.7",
     "react-native-webview": "^9.4.0",
     "styled-components": "^5.1.0",
-    "uuid": "^8.1.0"
+    "uuid": "^8.1.0",
+    "uuidv4": "^6.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

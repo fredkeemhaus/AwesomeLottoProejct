@@ -4,9 +4,17 @@ import { item } from "../api";
 import moment from "moment";
 import styled from "styled-components";
 import _ from 'lodash';
+import 'react-native-get-random-values';
+// import uuidv1 from "uuid";
+// import uuid from 'uuid'
 import { v1 as uuidv1 } from 'uuid';
+
+// import {nanoid} from 'nanoid'
 import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
+import * as Random from 'expo-random';
+import LottoNumbers from '../components/LottoNumbers'
+// 
 
 
 import {
@@ -53,9 +61,10 @@ export default class Lotto extends Component {
     super(props);
     this.state = {
       drwNumberData: null,
-      lottoNumber: null,
+      lottoNumber: [],
       saveNumber: [],
-      saveLottoNumber: ''
+      saveLottoNumber: '',
+      saveNumbers: {}
     };
   }
 
@@ -63,6 +72,8 @@ export default class Lotto extends Component {
   async componentDidMount() {
     try {
       await this.loadHomeData();
+      const r = await this._loadToDos();
+      console.log(r,'rrrrrrrrrrrrr')
     } catch (e) {
       console.log(e);
     }
@@ -96,11 +107,65 @@ export default class Lotto extends Component {
     })
   }
 
-  _addLottoNumber = (lottoNumber) => {
+  _numberReturnReset = () => {
+    this.setState({
+      lottoNumber: null
+    })
   }
 
+  
+
+  _addLottoNumber = async (lottoNumber) => {
+    if (lottoNumber && lottoNumber.length !== 0) {
+    this.setState(async (prevState) => {
+        // const ID = uuidv1();
+        const ID = await Random.getRandomBytesAsync(16);
+        console.log(ID)
+
+        const saveLottoNumberObject = {
+          [ID]: {
+            id: ID,
+            isCompleted: false,
+            number: lottoNumber,
+            createdAt: Date.now()
+          }
+        };
+        const newState = {
+          ...prevState,
+          lottoNumber: [],
+          saveNumbers: {
+            ...prevState.saveNumbers,
+            ...saveLottoNumberObject
+          }
+        }
+        this._saveNumbers(newState.saveNumbers)
+        return {...newState}
+      })
+    }
+
+    alert('저장되었습니다.')
+
+    console.log(this.state, '------------');
+  }
+
+  _loadToDos = async () => {
+    try {
+      const toDos = await AsyncStorage.getItem("toDos");
+      const parsedToDos = JSON.parse(toDos)
+      console.log(toDos,'asdssss');
+      this.setState({ loadedTodos: true, saveNumbers: parsedToDos || {}})
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  _saveNumbers = (newTodos) => {
+    const saveTodos = AsyncStorage.setItem("toDos", JSON.stringify(newTodos));
+  }
+
+
   render() {
-    const { drwNumberData, lottoNumber } = this.state;
+    const { drwNumberData, lottoNumber, saveNumbers } = this.state;
     const sortArray = lottoNumber && lottoNumber.sort(function(a, b) {
       return a - b
     });
@@ -116,13 +181,14 @@ export default class Lotto extends Component {
             <View style={{
               backgroundColor: 'white',
               padding: 20,
-              borderRadius: 14,
+              borderRadius: 8,
               marginVertical: 10,
               shadowOffset: {
                 width: 0,
                 height: 2,
               },
               shadowOpacity: 0.5,
+              elevation: Platform.OS === 'ios' ? 0 : 3
               }}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Text style={{fontWeight: 'normal', fontSize: 14}}>총 당첨인원</Text>
@@ -136,27 +202,19 @@ export default class Lotto extends Component {
             <View style={{
                 backgroundColor: 'white',
                 padding: 20,
-                borderRadius: 14,
+                borderRadius: 8,
                 marginVertical: 10,
                 shadowOffset: {
                   width: 0,
                   height: 2,
                 },
-                shadowOpacity: 0.5
+                shadowOpacity: 0.5,
+                elevation: Platform.OS === 'ios' ? 0 : 3
               }}>
               <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
                 <Text>{drwNumberData && drwNumberData.drwNo} 회차</Text>
               </View>
 
-              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
-                <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
-              </View>
-              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
-                <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
-              </View>
-              <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
-                <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
-              </View>
               <View style={{justifyContent: 'center', alignItems: 'center', paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#F4F4F4', marginBottom: 20}}>
                 <Text style={{fontWeight: 'bold', fontSize: 28}}>{numeral(drwNumberData && drwNumberData.firstWinamnt).format('0,0')} 원</Text>
               </View>
@@ -200,9 +258,9 @@ export default class Lotto extends Component {
               </NowLottoNumberContainer>
             </View>
           </View>
-          {lottoNumber ? (
+          {lottoNumber && lottoNumber.length !== 0 ? (
             <>
-              <View style={{backgroundColor: 'white', padding: 20, borderRadius: 14, marginVertical: 10}}>
+              <View style={{backgroundColor: 'white', padding: 20, borderRadius: 8, marginVertical: 10}}>
                 <NowLottoNumberContainer>
                   {sortArray.map((v, i) => {
                     return (
@@ -218,12 +276,18 @@ export default class Lotto extends Component {
                   })}
                 </NowLottoNumberContainer>
               </View>
-              <View>
+              <View style={{flexDirection: 'row', justifyContent: 'flex-end', width: '100%'}}>
                 <TouchableOpacity
-                  style={{flexDirection: 'row', justifyContent: 'flex-end', width: '100%', marginBottom: 20}}
+                  style={{flexDirection: 'row',}}
+                  onPress={() => this._numberReturnReset()}
+                >
+                  <Text style={{color: 'white', fontWeight: 'bold'}}>초기화</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{flexDirection: 'row', marginLeft: 10}}
                   onPress={() => this._addLottoNumber(lottoNumber)}
                 >
-                  <Text>저장하기</Text>
+                  <Text style={{color: 'white', fontWeight: 'bold'}}>저장하기</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -234,7 +298,7 @@ export default class Lotto extends Component {
                 marginTop: 10,
                 height: 45,
                 backgroundColor: 'white',
-                borderRadius: 14,
+                borderRadius: 8,
                 justifyContent: 'center',
                 alignItems: "center",
                 shadowOffset: {
@@ -242,15 +306,25 @@ export default class Lotto extends Component {
                   height: 2,
                 },
                 shadowOpacity: 0.5,
-                marginBottom: 20
+                marginBottom: 20,
+                elevation: Platform.OS === 'ios' ? 0 : 3
               }}
               onPress={this._numberReturn}
             >
-              <Text>
+              <Text style={{fontWeight: 'bold', fontSize: 16}}>
                 번호 뽑기
               </Text>
             </TouchableOpacity>
           )}
+          <ScrollView>
+            {Object.values(saveNumbers).map( number => (
+              <LottoNumbers 
+                  key={number.id}
+                  deleteNumber={this._deleteNumber}
+                  {...number}
+                />
+            ))}
+          </ScrollView>
         </ScrollView>
         <View style={{width: '100%', position: 'relative', bottom: 0}}>
           <AdMobBanner
