@@ -2,7 +2,6 @@ import React from "react";
 import { create, createStackNavigator } from "@react-navigation/stack";
 import Detail from "../screens/Detail";
 import Tabs from "./Tabs";
-import 'react-native-get-random-values';
 
 const Stack = createStackNavigator();
 

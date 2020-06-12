@@ -4,7 +4,7 @@ import { item } from "../api";
 import moment from "moment";
 import styled from "styled-components";
 import _ from 'lodash';
-import 'react-native-get-random-values';
+// import 'react-native-get-random-values';
 // import uuidv1 from "uuid";
 // import uuid from 'uuid'
 import { v1 as uuidv1 } from 'uuid';
@@ -12,7 +12,8 @@ import { v1 as uuidv1 } from 'uuid';
 // import {nanoid} from 'nanoid'
 import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
-import * as Random from 'expo-random';
+// import * as Random from 'expo-random';
+import uuid from 'react-native-uuid';
 import LottoNumbers from '../components/LottoNumbers'
 // 
 
@@ -115,11 +116,11 @@ export default class Lotto extends Component {
 
   
 
-  _addLottoNumber = async (lottoNumber) => {
+  _addLottoNumber =  (lottoNumber) => {
     if (lottoNumber && lottoNumber.length !== 0) {
-    this.setState(async (prevState) => {
-        // const ID = uuidv1();
-        const ID = await Random.getRandomBytesAsync(16);
+    this.setState(prevState => {
+        const ID = uuid.v1();
+        // const ID = await Random.getRandomBytesAsync(16);
         console.log(ID)
 
         const saveLottoNumberObject = {
@@ -161,6 +162,19 @@ export default class Lotto extends Component {
 
   _saveNumbers = (newTodos) => {
     const saveTodos = AsyncStorage.setItem("toDos", JSON.stringify(newTodos));
+  }
+
+  _deleteNumber = (id) => {
+    this.setState(prevState => {
+      const saveNumbers = prevState.saveNumbers;
+      delete saveNumbers[id];
+      const newState = {
+        ...prevState,
+        ...saveNumbers
+      }
+      this._saveNumbers(newState.saveNumbers)
+      return {...newState}
+    })
   }
 
 

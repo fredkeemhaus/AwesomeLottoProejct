@@ -4,7 +4,6 @@ import Lotto from "../screens/Lotto";
 import SlotLotto from "../screens/SlotLotto";
 import SaveNumber from "../screens/SaveNumber";
 import MyPage from "../screens/MyPage";
-import 'react-native-get-random-values';
 
 const Tabs = createBottomTabNavigator();
 

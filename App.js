@@ -6,7 +6,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Asset } from "expo-asset";
 import { Ionicons } from "@expo/vector-icons";
 import Stack from "./navigation/Stack";
-import 'react-native-get-random-values';
 
 const cacheImages = image =>
   images.map(image => {
