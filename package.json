@@ -18,6 +18,7 @@
     "expo-ads-admob": "^8.1.0",
     "expo-asset": "~8.0.0",
     "expo-font": "~8.0.0",
+    "expo-random": "^8.1.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "numeral": "^2.0.6",
