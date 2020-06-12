@@ -6,8 +6,9 @@ import styled from "styled-components";
 import _ from 'lodash';
 import numeral from 'numeral';
 import NumberTicker from 'react-native-number-ticker';
-import { v1 as uuidv1 } from 'uuid';
+// import { v1 as uuidv1 } from 'uuid';
 import * as Random from 'expo-random';
+// import uuid from 'react-native-uuid';
 
 import {
   AdMobBanner,
@@ -119,7 +120,8 @@ export default class Lotto extends Component {
   _addLottoNumber = (lottoNumber) => {
       this.setState(prevState => {
         if (lottoNumber && lottoNumber.length !== 0) {
-          const ID = Random.getRandomBytesAsync(16);
+          const ID = Random.getRandomBytesAsync(64);
+          // const ID =  uuid.v4();
           const saveLottoNumberObject = {
             [ID]: {
               id: ID,
@@ -216,8 +218,8 @@ export default class Lotto extends Component {
 
 
     return (
-      <View style={{ backgroundColor: '#21243d', flex: 1}}>
-        <ScrollView contentContainerStyle={{paddingHorizontal: 30, flex: 1}}>
+      <View style={{ backgroundColor: '#21243d',height: '100%'}}>
+        <ScrollView contentContainerStyle={{paddingHorizontal: 30, }}>
           <View style={{marginTop: 20}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={{fontWeight: 'bold', color: 'white'}}>오늘 날짜</Text>
@@ -409,7 +411,7 @@ export default class Lotto extends Component {
               </Text>
             </TouchableOpacity>
           )}
-          <ScrollView>
+          <View>
             {Object.values(saveNumbers).map( number => (
               <LottoNumbers 
                   key={number.id}
@@ -417,9 +419,9 @@ export default class Lotto extends Component {
                   {...number}
                 />
             ))}
-          </ScrollView>
+          </View>
         </ScrollView>
-        <View style={{width: '100%', position: 'absolute', bottom: 0}}>
+        <View style={{width: '100%', position: 'relative', bottom: 0}}>
           <AdMobBanner
             bannerSize="fullBanner"
             adUnitID="ca-app-pub-9486850272416310/1415959885" // Test ID, Replace with your-admob-unit-id
