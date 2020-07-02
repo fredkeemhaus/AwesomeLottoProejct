@@ -4,6 +4,9 @@
     "slug": "AwesomeLottoProject",
     "privacy": "public",
     "sdkVersion": "36.0.0",
+    "android": {
+      "package": "com.fredooks.lotto"
+    },
     "platforms": [
       "ios",
       "android",

@@ -116,32 +116,36 @@ export default class Lotto extends Component {
 
   
 
-  _addLottoNumber =  (lottoNumber) => {
-    if (lottoNumber && lottoNumber.length !== 0) {
-    this.setState(prevState => {
-        const ID = uuid.v1();
-        // const ID = await Random.getRandomBytesAsync(16);
-        console.log(ID)
-
-        const saveLottoNumberObject = {
-          [ID]: {
-            id: ID,
-            isCompleted: false,
-            number: lottoNumber,
-            createdAt: Date.now()
-          }
-        };
-        const newState = {
-          ...prevState,
-          lottoNumber: [],
-          saveNumbers: {
-            ...prevState.saveNumbers,
-            ...saveLottoNumberObject
-          }
+  _addLottoNumber =  async (lottoNumber) => {
+    try {
+      if (lottoNumber && lottoNumber.length !== 0) {
+        this.setState(prevState => {
+            const ID = uuid.v1();
+            // const ID = await Random.getRandomBytesAsync(16);
+            // console.log(ID)
+    
+            const saveLottoNumberObject = {
+              [ID]: {
+                id: ID,
+                isCompleted: false,
+                number: lottoNumber,
+                createdAt: Date.now()
+              }
+            };
+            const newState = {
+              ...prevState,
+              lottoNumber: [],
+              saveNumbers: {
+                ...prevState.saveNumbers,
+                ...saveLottoNumberObject
+              }
+            }
+            this._saveNumbers(newState.saveNumbers)
+            return {...newState}
+          })
         }
-        this._saveNumbers(newState.saveNumbers)
-        return {...newState}
-      })
+    } catch {
+      console.log(e)
     }
 
     alert('저장되었습니다.')

@@ -10,26 +10,8 @@ import {
   setTestDeviceIDAsync,
 } from 'expo-ads-admob';
 import { ScrollView } from "react-native-gesture-handler";
+import LottoNumbers from '../components/LottoNumbers'
 
-
-let Tasks = {
-  convertToArrayOfObject(tasks, callback) {
-    return callback(
-      tasks ? tasks.split("||").map((task, i) => ({ key: i, lottoNumber: task.split(",") })) : []
-    );
-  },
-  convertToStringWithSeparators(tasks) {
-    return tasks.map(task => task.text).join("||");
-  },
-  all(callback) {
-    return AsyncStorage.getItem("TASKS", (err, tasks) =>
-      this.convertToArrayOfObject(tasks, callback)
-    );
-  },
-  save(tasks) {
-    AsyncStorage.setItem("TASKS", this.convertToStringWithSeparators(tasks));
-  }
-};
 
 const LottoNumberContainerWrap = styled.View`
   background-color: white;
@@ -58,27 +40,56 @@ export default class SaveNumber extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      saveNumber: []
+      drwNumberData: null,
+      lottoNumber: [],
+      saveNumber: [],
+      saveLottoNumber: '',
+      saveNumbers: {}
     };
   }
 
 
   async componentDidMount() {
-    await this.loadSaveData();
+    try {
+      const r = await this._loadToDos();
+      console.log(r ,'--')
+    } catch(e) {
+      console.log(e)
+    }
+    
   };
   
   async componentWillReceiveProps(nextProps) {
     if (this.isOnEnter(nextProps)) {
-      await this.loadSaveData();
+      
     }
   }
 
-  loadSaveData = async () => {
+  _loadToDos = async () => {
     try {
-      await Tasks.all(saveNumber => this.setState({ saveNumber: saveNumber || [] }));
+      const toDos = await AsyncStorage.getItem("toDos");
+      const parsedToDos = JSON.parse(toDos)
+      this.setState({ loadedTodos: true, saveNumbers: parsedToDos || {}})
     } catch(e) {
       console.log(e)
     }
+  }
+
+  _deleteNumber = (id) => {
+    this.setState(prevState => {
+      const saveNumbers = prevState.saveNumbers;
+      delete saveNumbers[id];
+      const newState = {
+        ...prevState,
+        ...saveNumbers
+      }
+      this._saveNumbers(newState.saveNumbers)
+      return {...newState}
+    })
+  }
+
+  _saveNumbers = (newTodos) => {
+    const saveTodos = AsyncStorage.setItem("toDos", JSON.stringify(newTodos));
   }
 
   deleteTask = i => {
@@ -97,43 +108,21 @@ export default class SaveNumber extends Component {
   };
 
   render() {
-    const {saveNumber} = this.state;
-    console.log(saveNumber, 'asd')
+    const {saveNumber, saveNumbers} = this.state;
+    console.log(saveNumber, saveNumbers, 'asd')
     // console.log(saveNumber, 'sad')
     
     return (
-      <View style={{height: '100%', backgroundColor: '#4d4c7d'}}>
-        {saveNumber ? (
-          <ScrollView style={{paddingHorizontal: 30, marginTop: 10}}>
-            {saveNumber && saveNumber.map((v, i) => {
-              console.log(v, '0')
-              return (
-                <LottoNumberContainerWrap
-                  style={{
-                    shadowOffset: {
-                      width: 0,
-                      height: 2,
-                    },
-                    shadowOpacity: 0.5
-                  }}
-                >
-                  <NowLottoNumberContainer>
-                    {v.lottoNumber && v.lottoNumber.map((item, i) => {
-                      console.log(item, i, 'asdsd')
-                      return (
-                        <LottoNumberCircleBox>
-                          <Text>{item}</Text>
-                        </LottoNumberCircleBox>
-                      )
-                    })}
-                    
-                    <TouchableOpacity style={{width: 30, height: 30, justifyContent: 'center', alignItems: 'center', borderRadius: 30, borderWidth: 2, borderColor: 'black' }} onPress={() => this.deleteTask(i)}>
-                      <AntDesign name="delete" size={18} color="black" />
-                    </TouchableOpacity>
-                  </NowLottoNumberContainer>
-                </LottoNumberContainerWrap>
-              )
-            })}
+      <View style={{height: '100%', backgroundColor: '#21243d'}}>
+        {saveNumbers ? (
+          <ScrollView>
+            {Object.values(saveNumbers).map( number => (
+              <LottoNumbers 
+                  key={number.id}
+                  deleteNumber={this._deleteNumber}
+                  {...number}
+                />
+            ))}
           </ScrollView>
         ) : (
           <View>
