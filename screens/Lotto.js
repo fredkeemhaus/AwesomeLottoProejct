@@ -4,7 +4,6 @@ import { item } from "../api";
 import moment from "moment";
 import styled from "styled-components";
 import _ from 'lodash';
-// import 'react-native-get-random-values';
 // import uuidv1 from "uuid";
 // import uuid from 'uuid'
 import { v1 as uuidv1 } from 'uuid';
@@ -282,7 +281,11 @@ export default class Lotto extends Component {
                 <NowLottoNumberContainer>
                   {sortArray.map((v, i) => {
                     return (
-                      <LottoNumberCircleBox>
+                      <LottoNumberCircleBox
+                        style={{
+                          elevation: Platform.OS === 'ios' ? 0 : 3
+                        }}
+                      >
                         <NumberTicker
                           number={lottoNumber[i]}
                           textSize={14}
@@ -334,7 +337,7 @@ export default class Lotto extends Component {
               </Text>
             </TouchableOpacity>
           )}
-          <ScrollView>
+          <ScrollView style={{paddingBottom: 30}}>
             {Object.values(saveNumbers).map( number => (
               <LottoNumbers 
                   key={number.id}
