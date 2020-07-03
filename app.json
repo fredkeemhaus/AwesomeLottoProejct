@@ -5,7 +5,16 @@
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "android": {
-      "package": "com.fredooks.lotto"
+      "package": "com.fredooks.lotto",
+      "versionCode": 2,
+      "permissions": [
+        "CAMERA",
+        "CAMERA_ROLL",
+        "NOTIFICATIONS",
+        "VIBRATE",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "platforms": [
       "ios",
