@@ -101,7 +101,7 @@ export default class Lotto extends Component {
   }
 
   _numberReturn = () => {
-    let lottoNumber = _.sampleSize(_.range(1, 45), 7)
+    let lottoNumber = _.sampleSize(_.range(1, 45), 6)
     this.setState({
       lottoNumber
     })
